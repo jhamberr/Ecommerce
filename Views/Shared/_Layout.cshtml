@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All You Need Tech</title>
+    <link rel="icon" href="/images/icon.png"/>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Ecommerce.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <!--Javascript functions that allow us to add products to the shopping cart
+        these functions will be executed on the browser and you can create them
+        in the layout file like this. they will be accessible to all the pages of this
+        application. make a script element where we will create the Javascript functions
+    -->
+    <script>
+        function getShoppingCart() {
+            /*document.cookie contains all the cookies of our website with the following format
+             cookie1=value1; cookie2=value2; cookie3=value3; */
+             const cookieName = "shopping_cart";
+            let cookiesArray = document.cookie.split(';');//contains all available cookies
+            //for each element of the array read 1 cookie. loop over array to find cookie called "shopping_cart"
+            for (let i = 0; i < cookiesArray.length; i++) {
+                let cookie = cookiesArray[i];
+                if (cookie.includes(cookieName))/*check if cookie include name that we are looking for
+                which is the name of our shopping cart cookie*/
+                {
+                    //then read only the value (format:cookie1=value1) read until the end of the value of this cookie
+                    let cookie_value = cookie.substring(cookie.indexOf("=") + 1);
+                    //convert value to json
+                    try {
+                        let cart = JSON.parse(atob(cookie_value));//decode it from base 64
+                        return cart;//return cart cookie as javascript object which is json object
+                    }
+                    catch (exception) {
+                        break;
+                    }
+                }
+            }
+            //exit loop and return empty object if unsuccessful
+            return {};
+        }
+        /*store shopping cart in a cookie. method is called saveCart pass in shopping
+        cart which is json object */
+        function saveCart(cart) {
+           // let cartStr = JSON.stringify(cart)//convert json to string
+            let cartStr = btoa(JSON.stringify(cart))//convert to base64
+            //then need to save shopping cart into cookie.
+            //save cookie
+            let d = new Date();
+            d.setDate(d.getDate() + 365); //this cookie expires after 365 days (1 year)
+            let expires = d.toUTCString();//read date as string
+            /*save cart into a cookie. shopping_cart= is the name of the cookie, cartSt is the value
+            expires is expiration date, Secure means cookie only transmitted over HTTPS*/
+            document.cookie = "shopping_cart=" + cartStr + ";expires=" + expires + ";path=/; SameSite=Strict; Secure"
+        }
+        /* function to add products to shopping cart,button button is the button in which we click and 
+        it is passed into the function*/
+        function addToCart(button, id) {
+            let cart = getShoppingCart();//get cookie as json
+
+            let quantity = cart[id]//read quantity of product with whatever id is passed in. read from shopping cart json
+            if (isNaN(quantity)) {
+                //if the quantity is not a Number(dont have product with this ID) => set quantity to 1
+                cart[id] = 1 
+            }
+            else {
+                /*if quantity is a number means that we added a product with this ID to the cart 
+                increase quantity by 1*/
+                cart[id] = Number(quantity) + 1;
+            }
+            //after updating cart save the new value of the cart into the cookie
+            saveCart(cart);
+            //change text of button after it is clicked. bootstrap check icon
+            button.innerHTML = "Added <i class='bi bi-check-lg'></i>";
+            
+            /*Update cart size in nav bar */
+            let cartSize = 0;//initially cart size = 0
+            //for every cart item in cart object
+            for (var cartItem of Object.entries(cart)) {
+                quantity = cartItem[1]//read quantity. cart item is composed of product id and quantity so second element of this array will be the quantity[1]
+                if (isNaN(quantity)) continue;//if not number then skip it
+                
+                cartSize += Number(quantity)//add qty to cart size then display in nav bar
+            }
+            //get element by id and CartSize is the span . new content of span will be cart size value
+            document.getElementById("CartSize").innerHTML = cartSize
+        }
+       //<!--increase quanity of one product by ID-->
+        function increase(id) {
+            let cart = getShoppingCart();
+
+            let quantity = cart[id]//get quantity depending on product id
+            if (isNaN(quantity)) {
+                //if quantity of product is not a number  => set it to 1
+                cart[id] = 1
+            }
+            else{
+                cart[id] = Number(quantity) + 1;//read quantity by number and increase by 1
+            }
+
+            saveCart(cart);//save the new shopping cart in shopping cart cookie
+            location.reload()//refresh page
+        }
+        //<!--decrease quanity of one product by ID-->
+        function decrease(id) //get id of the item
+        {
+            let cart = getShoppingCart();//get shopping cart cookie
+
+            let quantity = cart[id]//read quantity of the item
+            if (isNaN(quantity)) {
+                //quantity is Not a Number => exit
+                return
+            }
+
+            quantity = Number(quantity) // convert quantity to number
+
+            if (quantity > 1) {
+                cart[id] = quantity - 1
+                saveCart(cart)
+                location.reload()
+            }
+        }
+        //Delete product from cart
+        function remove(id) {
+            let cart = getShoppingCart();//return json object
+
+            if (cart[id]){
+                delete cart[id]//delete object by key
+                saveCart(cart) //save cart to cookie
+                location.reload()
+            }
+        }
+    </script>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                   <img src="/images/icon.png" alt="..." width="30" class="me-2"/> All You Need Tech
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Index">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+
+                    @using Ecommerce.Services
+
+                    <ul class="navbar-nav me-2">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
+                               <i class="bi bi-cart4 text-danger h3"></i> 
+                               <span id="CartSize" class="badge rounded-pill bg-danger" style="vertical-align: top">
+                                   @CartHelper.GetCartSize(Context.Request, Context.Response)
+                               </span>
+                            </a>
+                        </li>
+                    </ul>
+
+
+               
+                  
+                    @using Microsoft.AspNetCore.Identity <!--sign in manger and user manager belong to identity so we have to add this namespace-->
+                    @inject SignInManager<ApplicationUser> SignInManager/*request identity services from serive container */
+                    @inject UserManager<ApplicationUser> UserManager
+                    @if (SignInManager.IsSignedIn(User))//check if user is authenticated or not
+                    {
+                        var appUser = await UserManager.GetUserAsync(User);//get user that is signed in
+
+                        if (User.IsInRole("admin"))//display dropdown if the user is the admin
+                        {
+                            <!--Drop down-->
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @(appUser!.FirstName + " " + appUser!.LastName + "(Admin)")
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Products" asp-action="Index">Products</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="AdminOrders" asp-action="Index">Orders</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Users" asp-action="Index">Users</a></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                        <li> <hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        }
+                        else if (User.IsInRole("client"))//display dropdown
+                        {
+                            <!--Drop down-->
+                            <ul class="navbar-nav">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @(appUser!.FirstName + " " + appUser!.LastName + "(Client)")
+                                    </a>
+                                    <ul class="dropdown-menu">
+
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile">Profile</a></li>
+                                        <li> <hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Acccount" asp-action="Logout">Logout</a>
+                                </li>
+                            </ul>
+                        }
+                    }
+                    else
+                    {
+                        <!--make another unordered list element for register and login-->
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <!--When clicking register want to execute register action of account controller-->
+                                <!--use bootstrap classes to make buttons out of these links, use me-2 to create some space between them margin end of 2 units
+                                    make some space in middle between the 2 buttons-->
+                                <a class="btn btn-outline-primary me-2" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        </ul>
+                        
+                    }
+
+                   
+
+
+                </div>
+            </div>
+        </nav>
+    </header>
+    @if(ViewData["HomePage"]== null)
+    {
+        <div class="container mt-3">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    }
+    else
+    {
+        @RenderBody()
+    }
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            <img src="/images/icon.png" alt="..." width="30" class="me-2" />
+            &copy; 2024 - All You Need Tech - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

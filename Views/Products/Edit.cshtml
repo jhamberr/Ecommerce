@@ -1,0 +1,140 @@
+﻿@model ProductDto //this is the productDto that is passed into the view function from the controller
+@{
+}
+
+
+<div class="row">
+    <div class="col-md-8 mx-auto rounded border p-3">
+        <h2 class="text-center mb-5">Edit Product</h2>
+
+
+        <!-- Form will Post Image to the server-->
+        <form method="post" enctype="multipart/form-data">
+            <!-- ID row-->
+            <div class="row mb-3">
+                <!-- Column 1 Column for Name Label-->
+                <label class="col-sm-4 col-form-label">Name</label>
+                <!--Column 2 Column for Name Input Using Asp Helper tags to implicitly bind the type of input
+                    this input field will be bound to the name property of product DTO(product dto is bound to the form)
+                -->
+                <div class="col-sm-8">
+                    <input class="form-control-plaintext" readonly value="@ViewData["ProductId"] " />
+                    
+                </div>
+            </div>
+            <!-- Name row-->
+            <div class="row mb-3">
+                <!-- Column 1 Column for Name Label-->
+                <label class="col-sm-4 col-form-label">Name</label>
+                <!--Column 2 Column for Name Input Using Asp Helper tags to implicitly bind the type of input
+                    this input field will be bound to the name property of product DTO(product dto is bound to the form)
+                -->
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="Name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <!-- Brand row-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Brand</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="Brand" />
+                    <span asp-validation-for="Brand" class="text-danger"></span>
+                </div>
+            </div>
+            <!-- Category row-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Category</label>
+                <!--second column is a dropdown menu using select tag. bound to category in productDTP-->
+                <div class="col-sm-8">
+                    <select class="form-select" asp-for="Category">
+                        <!--Value is simply the data that is filled into the internal attributes when the
+                            product is created. it is of category type meaning string so any one of these items
+                            will be stored in the category
+                        -->
+                        <option value='Other'>Other</option>
+                        <option value='Phones'>Phones</option>
+                        <option value='Computers'>Computers</option>
+                        <option value='Accessories'>Accessories</option>
+                        <option value='Printers'>Printers</option>
+                        <option value='Cameras'>Cameras</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Price row-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Price</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="Price" />   <!-- no / for closing input?-->
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+            </div>
+            <!-- Description row-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Description</label>
+                <div class="col-sm-8">
+                    <textarea class="form-control" asp-for="Description"> </textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+
+
+            <!-- Display Image-->
+            <div class="row mb-3">
+                <!-- Display bootstrap column after some space (offset-sm-4)-->
+                <div class="offset-sm-4 col-sm-8">
+                    <!-- Display the image in vieewdata dictionary under the key
+
+                    with the image file name below add width of image. viewdata is built in component to view?
+                    -->
+                    <img src="/products/@ViewData["ImageFileName"]" width="150" />
+                </div>
+            </div>
+
+            <!-- Image row-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Image</label>
+                <div class="col-sm-8">
+                    <!-- This line specifies that the column will have an input field and the
+                        asp-for is the type bound to it.
+                    -->
+                    <input class="form-control" asp-for="ImageFile" />
+                    <span asp-validation-for="ImageFile" class="text-danger"></span>
+                </div>
+            </div>
+            <!-- Display Created At Time-->
+            <div class="row mb-3">
+                <!-- Col 1-->
+                <label class="col-sm-4 col-form-label">Created At</label>
+                <!-- Col 2-->
+                <div class="col-sm-8">
+                    <!-- Not bound to anything inproduct dto just has value available in view data
+                        dictionary at the key called "createdAt"
+                    -->
+                    <input class="form-control-plaintext" readonly value="@ViewData["CreatedAt"]" />
+                </div>
+            </div>
+            <!-- Submit and cancle button row with 2 columns-->
+            <div class="row">
+                <!-- First column(submit)-->
+                <div class="offset-sm-4 col-sm-4 d-grid">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <!-- Second Column with button of type link-->
+                <!-- When you click cancel it will execute index method of products controller
+                    clicking on cancel will display a list of products again
+                -->
+                <div class="col-sm-4 d-grid">
+                    <a class="btn btn-outline-primary" asp-controller="Products" asp-action="Index" role="button">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!-- Testing the form below by copying the code above-->

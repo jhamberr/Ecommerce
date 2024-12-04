@@ -1,0 +1,154 @@
+﻿@using Microsoft.AspNetCore.Html
+@model List<Product>
+@{
+    // C# block inside a cshtml file the c# part
+
+
+    /*have to convert to integer and add exclamation to specify that youre sure 
+     * we have an integer in the data called page index*/
+    int pageIndex = (int)ViewData["PageIndex"]!;
+    int totalPages = (int)ViewData["TotalPages"]!;
+    string search = (string)ViewData["Search"]!;
+    //read col name and orderby in the view accessed from controller
+    /*! means we are sure that it isnt null?*/
+    string column = (string)ViewData["Column"]!;
+    string orderBy = (string)ViewData["OrderBy"]!;
+
+   HtmlString getArrow(string tableColumn)
+    {
+       // if column is not the one we want to sort return empty string
+        if (tableColumn != column) return new HtmlString("");
+        if (orderBy == "desc")
+        {
+            return new HtmlString("&darr;");
+        }
+
+        return new HtmlString("&uarr;");
+    }
+}
+
+<!-- HTML markup outside the C# block -->
+
+
+<h2 class="text-center mb-5">List of Products</h2>
+<!-- New Product Button -->
+<!-- This is a row with 2 columns -->
+<div class="row mb-5">
+    <!--Column 1 New Product-->
+    <div class="col">
+        <!-- Using asp helper tags instead of href attributes-->
+        <!-- Controller is the Route and action is the function-->
+        <a class="btn btn-primary" asp-controller="Products" asp-action="Create">New Product</a>
+    </div>
+    <!--Column 2 Search-->
+    <div class="col">
+        <!--Column 2 taken from bootstrap
+            add name attribute that we want to send to the server
+            name attribute is what shows up as query parameter
+        -->
+         <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" name="search" value="@search" placeholder="Search by Name or Brand" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+         </form>
+    </div>
+</div>
+<!--Implement Sort function here. it is a javacript function so we need to implement in the javascript 
+     script element /tag-->
+<script>
+    function sortTable(column){
+
+        /* */
+        let orderBy = "desc";
+        let currentColumn = "@column";
+        let currentOrder = "@orderBy";
+        /*if col which is what is sent into function, is == curr col name,
+        this means that we clicked on a column that i scurrently used to sort the table
+        this sends request to server and changes orderby to ascending or descending depending on column clicked
+        it changes the curr column to whatever you click on also it 
+        basically makes final edits before the final query string is sent at the end*/
+        if (column === currentColumn) {
+            if (currentOrder == "asc") orderBy = "desc";
+            else orderBy = "asc";
+        }
+        /*Send request to server containing column name*/
+        /*Request going to same url so dont need to provide the full path
+        Only need to provide the query string
+        use ampersand to separate the diffeent parameters*/
+        window.location.href = "?search=@(search)&column=" + column + "&orderBy=" + orderBy
+    }
+</script>
+
+
+
+
+<table class="table">
+    <!-- Table Header makes it bold-->
+        <thead>
+        <!-- Table Row/could add any number of rows -->
+            <tr>
+                <!-- TH is columns in the row -->
+                <!--Sort by ID upon clicking send property to the function-->
+                <th style ="cursor: pointer;" onclick="sortTable('Id')">ID @getArrow("Id")</th>
+                <!--The column name in the DB is Name so sort by name here-->
+            <th style="cursor: pointer;" onclick="sortTable('Name')">Name @getArrow("Name")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Brand')">Brand @getArrow("Brand")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Category')">Category @getArrow("Category")</th>
+            <th style="cursor: pointer;" onclick="sortTable('Price')">Price @getArrow("Price")</th>
+                <th>Image</th>
+                <!--Current name in DB is CreatedAt without the space so sort by that name in the DB-->
+            <th style="cursor: pointer;" onclick="sortTable('CreatedAt')">Created At @getArrow("CreatedAt")</th>
+                <th >Action</th>
+            </tr>
+
+        </thead>
+    <!--Regular rows with values for the columns. no special header
+           -->
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <!--Make a row for each record and it has to correspond to the amount of columns
+                    defined above
+                -->
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Brand</td>
+                    <td>@product.Category</td>
+                    <td>@(product.Price)$</td>
+                    <td><img src="/products/@product.ImageFileName" width="100"  /></td>
+                    <td>@product.CreatedAt.ToString("MM/dd/yyyy")</td>
+                    <td style="white-space:nowrap">
+                        <!--We specify to add the product id to the url. url parameters. parametierized routes
+
+                        -->
+                        <a class="btn btn-primary btn-sm" asp-controller="Products" asp-action="Edit"
+                            asp-route-id="@product.Id">Edit</a>
+                    <!--add onlclick javascript code for toast warning-->
+                        <a class="btn btn-danger btn-sm" asp-controller="Products"  asp-action="Delete"
+                            asp-route-id="@product.Id" onclick="return confirm('Are you sure?')">Delete</a>
+
+                    </td>
+                
+                </tr>
+            
+            }
+        </tbody>
+
+</table>
+
+<!--Pageination-->
+<nav >
+      <ul class="pagination">
+           @for(int i = 1; i <= totalPages; i++)
+            {
+                string active = "";
+            if (i == pageIndex) active = "active";
+            <!--Use asp  tag helper asp-route-varname to pass in parameters to components in html
+                in this case the pagination button/component
+            -->
+            <li class="page-item @active"> <a class="page-link" asp-route-pageIndex ="@i"
+            asp-route-search="@search" asp-route-column ="@column" asp-route-orderBy ="@orderBy">@i</a></li>
+            }
+    </ul>
+</nav>
+

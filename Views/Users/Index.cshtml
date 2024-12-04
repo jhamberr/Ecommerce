@@ -1,0 +1,94 @@
+﻿@model List<ApplicationUser>
+<!-- //to request user role we need to request user manager from service container  -->
+<!-- we first need to add the package below. we need to add the namespace -->
+@using Microsoft.AspNetCore.Identity
+<!--request user manager from service container and can call variable UserManager -->
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+}
+
+<h2 class="text-center mb-5">List of Users</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th> 
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Created At</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <!--For each user create a row and display the columns(Tdata)-->
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@(user.FirstName + " " + user.LastName) </td>
+                <td>@user.Email</td>
+                <td>@user.PhoneNumber</td>
+                <td>
+                    @{
+                        var roles = await UserManager.GetRolesAsync(user);//return list of roles (iterable or array?)
+                        var rolesStr = String.Join(", ", roles);//convert list to string, separate by comma and space
+                                                                //display roles
+                        string color = "bg-secondary";
+
+                        if (roles.Contains("admin"))
+                        {
+                            color = "bg-danger";
+                        }
+                        else if (roles.Contains("seller"))
+                        {
+                            color = "bg-warning text-dark";
+                        }
+                        else if (roles.Contains("client"))
+                        {
+                            color = "bg-info text-dark";   
+                        }
+
+                        <span class="badge rounded-pill @color">@rolesStr</span>
+                    }
+                </td>
+                <td>@user.CreatedAt.ToString("MM/dd/yyyy")</td>
+                <td>
+                    <!--display a button for action column takes us to details action of user controller/page
+                        user tag helper to include user id
+                    -->
+                    <a class="btn btn-primary btn-sm" asp-controller="Users" asp-action="Details"
+                        asp-route-id ="@user.Id">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<nav>
+    <ul class="pagination"><!--Manually add bootstrap pagination  for this-->
+        <!--###1For every page-->
+        @for (int i = 1; i <= ViewBag.TotalPages; i++) 
+        {
+            string active = "";
+         <!--click on I then it is sent in as page index to the action and set to active while all 
+
+         others are blank when the page loads (previous value of pageindex will be active)and iterates through 
+         the pages. it is tracking which number up to num of pages i(displayed number) is equal to current page index?-->
+            if (i == ViewBag.PageIndex) active = "active";//pageindex will equal 1 of the displayed pages
+            <!--###2Create ta pagination button. if the value of i corresponds to current page we will highlight the button-->
+            <li class="page-item @active">
+                <!--i tracks the current page if you click a link and displays all pages in general.clicking on a 
+                page passes the page index as i the current page to the tag helper as parameter which goes to action-->
+                <!--###3 this pagination button will display the value of i (>@i</a>) .when we click the button we will send a request
+                    to the same url thats why we dont have the name of the controller and action.we will add a parameter called
+                    pageIndex which will be equal to the value of i (asp-route-pageIndex="@i") . 
+                -->
+                <a class="page-link" asp-route-pageIndex="@i">@i</a><!--generate a link for each page and pass in the index of the current page to the action so that it can be highlighted-->
+            </li>
+
+        }
+    </ul>
+</nav>

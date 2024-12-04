@@ -1,0 +1,45 @@
+﻿@model Product
+@{
+}
+<!--Whole page is a row-->
+<div class="row">
+    <!--1 Col has the IMG-->
+    <div class="col-md-4 text-center">
+        <img src="/products/@Model.ImageFileName" class="img-fluid mb-3" alt="..." width="250" />
+    </div>
+    <!-- Col2 has name price button and cart IMG along with new rows-->
+    <div class="col-md-8">
+        <h3 class="mb-3">@Model.Name</h3>
+        <h3 class="mb-3">$@(Model.Price)</h3>
+        <button type="button" class="btn btn-warning btn-sm" onclick="addToCart(this, @Model.Id)">
+            Add to Cart <i class="bi bi-cart4"></i>
+        </button>
+
+        <hr />
+
+        <!--New Row(Row 2)-->
+        <!--Brand Row-->
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">
+                Brand
+            </div>
+            <div class="col-sm-9">
+                @Model.Brand
+            </div>
+        </div>
+        <!--New Row(Row 3)-->
+        <!--Category Row-->
+        <div class="row mb-3">
+            <div class="col-sm-3 fw-bold">
+                Category
+            </div>
+            <div class="col-sm-9">
+                @Model.Category
+            </div>
+        </div>
+        <!--Not a row but information placed at the bottom-->
+        <!--Description-->
+        <div class="fw-bold">Description </div>
+        <div style="white-space: pre-line">@Model.Description</div>
+    </div>
+</div>

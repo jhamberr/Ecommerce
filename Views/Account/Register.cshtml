@@ -1,0 +1,108 @@
+﻿@model RegisterDto //bind register dto model to the form
+@{
+}
+
+<!--Title of page-->
+<div class="row">
+    <!--use bootstrap col to display to center of page and add rounded border to column-->
+    <div class="col-lg-6 mx-auto rounded border p-4">
+        <!--H2 element containing title register displayed at center-->
+        <h2 class="text-center mb-3">Register</h2>
+        <hr />
+        <!--Dieplay general  errors-->
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <!--Register Form. submit using post method. submitted to same url so omit action attribute-->
+        <form method="post">
+
+            <!--First Field of form first name-->
+            <div class="row mb-3">    <!--add bootstrap row->
+                <!--row contain label first name-->
+                <!--Star because name is required-->
+                <label class="col-sm-4 col-form-label">First Name*</label>
+                <!--add col for input field bound to firstname of DTO-->
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="FirstName" />
+                    <!--Validate the firstnamedto field-->
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+            </div>
+            <!--Second Field of form last name-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Last Name*</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="LastName" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!--Third Field of form Email-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Email*</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!--Fourth Field of form Phone number-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Phone</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="PhoneNumber" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!--Fifth Field of form Address-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Address*</label>
+                <div class="col-sm-8">
+                    <input class="form-control" asp-for="Address" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!--Password-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Password*</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="password" asp-for="Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!--Confirm Password-->
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label">Confirm Password*</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="password" asp-for="ConfirmPassword" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+            </div>
+
+
+            <!--Then add 2 buttons to the form-->
+                <div class="row mb-3">
+                <!--register button col 1-->
+                <!--display after offset to match/align with other fields of form-->
+                    <div class="offset-sm-4 col-sm-4 d-grid">
+                    <!--button is of Type submit allows us to submit the entire form-->
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                    <!--cancel button col 2-->
+                <!--grid means buttons will take full width of column-->
+                    <div class="col-sm-4 d-grid">
+                    <!--going to new page so specify route with controller then which view?/action-->
+                    <!--instead of button of type submit this is a link of type bootstrap button-->
+                        <a class="btn btn-outline-primary" asp-controller="Home" asp-action="Index" role="button">
+                            Cancel
+                        </a>
+                    </div>  
+                </div>
+
+        </form>
+    </div>
+
+
+</div>
